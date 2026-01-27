@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-const BASE_URL = "http://localhost:5000/api";
+// Use environment variable for API URL
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log("🔐 Attempting login to:", BASE_URL);
       const res = await axios.get(`${BASE_URL}/users`);
       const users = res.data;
 
@@ -28,17 +32,35 @@ const Login = () => {
 
       if (user) {
         // Store user data
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("userRole", user.role || "inspector");
+        const userData = JSON.stringify(user);
+        const userRole = user.role || "inspector";
+        const token = "token-" + Date.now();
         
-        // Force navigation
-        window.location.href = "/app/dashboard";
+        localStorage.setItem("user", userData);
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem("token", token);
+        
+        console.log("✅ Login successful");
+        
+        // Notify App component
+        if (onLogin) {
+          onLogin(user, userRole);
+        }
+        
+        // Small delay to ensure state updates
+        setTimeout(() => {
+          navigate("/app/dashboard", { replace: true });
+        }, 100);
       } else {
         setError("Invalid email or password");
       }
     } catch (err) {
-      console.error(err);
-      setError("Login failed! Please try again.");
+      console.error("❌ Login error:", err);
+      if (err.code === 'ERR_NETWORK') {
+        setError("Cannot connect to server. Please check if backend is running.");
+      } else {
+        setError("Login failed! Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -67,6 +89,8 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log("📝 Attempting signup to:", BASE_URL);
+      
       // Check if email already exists
       const checkRes = await axios.get(`${BASE_URL}/users`);
       const users = checkRes.data;
@@ -90,7 +114,7 @@ const Login = () => {
 
       const createRes = await axios.post(`${BASE_URL}/users`, newUserData);
       
-      console.log("User created successfully:", createRes.data);
+      console.log("✅ User created successfully:", createRes.data);
 
       // Wait a moment for database to update
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -101,18 +125,32 @@ const Login = () => {
       const newUser = updatedUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
       if (newUser) {
-        localStorage.setItem("user", JSON.stringify(newUser));
-        localStorage.setItem("userRole", newUser.role || "inspector");
+        const userData = JSON.stringify(newUser);
+        const userRole = newUser.role || "inspector";
+        const token = "token-" + Date.now();
         
-        // Force navigation with full page reload
-        window.location.href = "/app/dashboard";
+        localStorage.setItem("user", userData);
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem("token", token);
+        
+        console.log("✅ Signup successful");
+        
+        // Notify App component
+        if (onLogin) {
+          onLogin(newUser, userRole);
+        }
+        
+        // Small delay to ensure state updates
+        setTimeout(() => {
+          navigate("/app/dashboard", { replace: true });
+        }, 100);
       } else {
         setError("Account created but login failed. Please try logging in.");
         setIsLogin(true);
       }
 
     } catch (err) {
-      console.error("Signup error details:", err.response || err);
+      console.error("❌ Signup error details:", err.response || err);
       
       // More specific error messages
       if (err.response) {
@@ -199,6 +237,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="email"
               />
             </div>
 
@@ -215,6 +254,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="current-password"
               />
             </div>
 
@@ -269,6 +309,7 @@ const Login = () => {
                 onChange={(e) => setName(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="name"
               />
             </div>
 
@@ -285,6 +326,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="email"
               />
             </div>
 
@@ -302,6 +344,7 @@ const Login = () => {
                 required
                 disabled={loading}
                 minLength={6}
+                autoComplete="new-password"
               />
             </div>
 
@@ -319,6 +362,7 @@ const Login = () => {
                 required
                 disabled={loading}
                 minLength={6}
+                autoComplete="new-password"
               />
             </div>
 

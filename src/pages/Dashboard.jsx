@@ -1,13 +1,14 @@
-// src/pages/Dashboard.jsx
-
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import LineChartComp from "./LineChartComp";
 import "./Dashboard.css";
 
-const BASE_URL = "http://localhost:5000/api";
+// Use environment variable for API URL
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [defectData, setDefectData] = useState([]);
   const [allInspections, setAllInspections] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -71,7 +72,7 @@ const Dashboard = () => {
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("📊 Fetching dashboard data...");
+      console.log("📊 Fetching dashboard data from:", BASE_URL);
 
       // Fetch inspections
       const inspectionsRes = await axios.get(`${BASE_URL}/inspections`);
@@ -408,20 +409,29 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - FIXED WITH REACT ROUTER */}
       <div className="quick-actions">
-        <a href="/app/inspections" className="quick-action-btn">
+        <button 
+          onClick={() => navigate('/app/inspections')} 
+          className="quick-action-btn"
+        >
           <i className="fas fa-plus-circle"></i>
           <span>New Inspection</span>
-        </a>
-        <a href="/app/defects" className="quick-action-btn">
+        </button>
+        <button 
+          onClick={() => navigate('/app/defects')} 
+          className="quick-action-btn"
+        >
           <i className="fas fa-bug"></i>
           <span>Report Defect</span>
-        </a>
-        <a href="/app/products" className="quick-action-btn">
+        </button>
+        <button 
+          onClick={() => navigate('/app/products')} 
+          className="quick-action-btn"
+        >
           <i className="fas fa-box"></i>
           <span>View Products</span>
-        </a>
+        </button>
         <button onClick={fetchDashboardData} className="quick-action-btn">
           <i className="fas fa-sync-alt"></i>
           <span>Refresh Data</span>
