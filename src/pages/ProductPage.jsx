@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./DataPages.css";
 
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);

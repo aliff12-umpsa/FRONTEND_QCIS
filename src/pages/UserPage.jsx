@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api"; // use centralized API
 import "./DataPages.css";
-
-const API = "http://localhost:5000/api/users";
 
 const UserPage = () => {
   const [users, setUsers] = useState([]);
@@ -18,41 +16,42 @@ const UserPage = () => {
   const [editingPassword, setEditingPassword] = useState("");
   const [editingRole, setEditingRole] = useState("");
 
+  // Fetch users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(API);
+      const res = await api.get("/users");
       setUsers(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error fetching users:", err);
     }
   };
 
+  // Add user
   const addUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(API, { name, email, password, role });
-      setName("");
-      setEmail("");
-      setPassword("");
-      setRole("inspector");
+      await api.post("/users", { name, email, password, role });
+      setName(""); setEmail(""); setPassword(""); setRole("inspector");
       fetchUsers();
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error adding user:", err);
       alert("Error adding user. Please try again.");
     }
   };
 
+  // Delete user
   const deleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
     try {
-      await axios.delete(`${API}/${id}`);
+      await api.delete(`/users/${id}`);
       fetchUsers();
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error deleting user:", err);
       alert("Error deleting user. Please try again.");
     }
   };
 
+  // Start edit
   const startEdit = (user) => {
     setEditingUserId(user.id);
     setEditingName(user.name);
@@ -61,33 +60,28 @@ const UserPage = () => {
     setEditingRole(user.role || "inspector");
   };
 
+  // Update user
   const updateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API}/${editingUserId}`, {
+      await api.put(`/users/${editingUserId}`, {
         name: editingName,
         email: editingEmail,
         password: editingPassword,
         role: editingRole,
       });
-      setEditingUserId(null);
-      setEditingName("");
-      setEditingEmail("");
-      setEditingPassword("");
-      setEditingRole("");
+      cancelEdit();
       fetchUsers();
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error updating user:", err);
       alert("Error updating user. Please try again.");
     }
   };
 
+  // Cancel edit
   const cancelEdit = () => {
     setEditingUserId(null);
-    setEditingName("");
-    setEditingEmail("");
-    setEditingPassword("");
-    setEditingRole("");
+    setEditingName(""); setEditingEmail(""); setEditingPassword(""); setEditingRole("");
   };
 
   useEffect(() => {
@@ -141,11 +135,7 @@ const UserPage = () => {
             </div>
             <div className="form-field">
               <label>Role *</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required
-              >
+              <select value={role} onChange={(e) => setRole(e.target.value)} required>
                 <option value="inspector">Inspector</option>
                 <option value="admin">Admin</option>
               </select>
@@ -195,11 +185,7 @@ const UserPage = () => {
               </div>
               <div className="form-field">
                 <label>Role *</label>
-                <select
-                  value={editingRole}
-                  onChange={(e) => setEditingRole(e.target.value)}
-                  required
-                >
+                <select value={editingRole} onChange={(e) => setEditingRole(e.target.value)} required>
                   <option value="inspector">Inspector</option>
                   <option value="admin">Admin</option>
                 </select>
