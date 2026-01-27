@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/FRONTEND_QCIS/static/css/main.0f858b40.css",
-    "main.js": "/FRONTEND_QCIS/static/js/main.ebb315e1.js",
+    "main.js": "/FRONTEND_QCIS/static/js/main.e87ea87d.js",
     "index.html": "/FRONTEND_QCIS/index.html",
     "main.0f858b40.css.map": "/FRONTEND_QCIS/static/css/main.0f858b40.css.map",
-    "main.ebb315e1.js.map": "/FRONTEND_QCIS/static/js/main.ebb315e1.js.map"
+    "main.e87ea87d.js.map": "/FRONTEND_QCIS/static/js/main.e87ea87d.js.map"
   },
   "entrypoints": [
     "static/css/main.0f858b40.css",
-    "static/js/main.ebb315e1.js"
+    "static/js/main.e87ea87d.js"
   ]
 }
